@@ -125,4 +125,25 @@
       showToast('bg-danger', 'Error!', 'Something went wrong!\n' + error.message);
     });
   });
+  function addEventListeners() {
+            document.getElementById('loginWithEmail').addEventListener('click', function () {
+                document.getElementById('whatsapp-login-form').style.display = 'none';
+                document.getElementById('email-login-form').style.display = 'block';
+            });
+
+            document.getElementById('loginWithPhone').addEventListener('click', function () {
+                document.getElementById('email-login-form').style.display = 'none';
+                document.getElementById('whatsapp-login-form').style.display = 'block';
+            });
+
+            document.getElementById('loginForm').addEventListener('submit', function (event) {
+                var recaptchaResponse = grecaptcha.getResponse();
+                if (document.getElementById('email-login-form').style.display === 'block' && recaptchaResponse.length === 0) {
+                    event.preventDefault();
+                    alert('Please complete the CAPTCHA');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', addEventListeners);
 })()
