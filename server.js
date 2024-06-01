@@ -1,5 +1,5 @@
 'no strict';
-require('dotenv').config();
+require('dotenv').config({ path: './example.env' });
 
 const express = require('express');
 const session = require('express-session');
