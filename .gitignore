@@ -64,3 +64,5 @@ gulpfile.tmp.*
 
 # env
 .env
+
+sessions

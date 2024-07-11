@@ -3,6 +3,7 @@ require('dotenv').config({ path: './example.env' });
 
 const express = require('express');
 const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
 const multer = require('multer')();
 const path = require('path');
 const fs = require('fs');
@@ -12,57 +13,47 @@ const app = express();
 app.set('views', path.resolve(process.cwd(), 'html'));
 app.set('view engine', 'ejs');
 app.use(multer.array());
-app.use('/assets', express.static(path.resolve(process.cwd(), 'assets')));
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-  secret: process.env.SESS_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  cookie: { secure: false }
+    store: new SQLiteStore({ dir: path.resolve(process.cwd(), 'sessions'), createDirIfNotExists: true, db: 'sessions.db'}),
+    secret: process.env.SESS_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
 }))
-
+app.use('/assets', express.static(path.resolve(process.cwd(), 'assets')));
 
 app.get('/', (req, res) => {
-    // validate if user is logged in
-    if(req.session?.isLogin) {
-        res.render('index', { isLogin: req.session.isLogin, isAdmin: true, 
-            numberUser: 62, userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
-            pageActive: 'redeem'
-        });
-    } else {
-        res.redirect('/login');
-    }
+    if(!req.session.isLogin) return res.redirect('/login');
+
+    res.render('index', { isLogin: req.session.isLogin, isAdmin: true, 
+        numberUser: req.session.iId, userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        pageActive: 'redeem'
+    });
 });
 
 app.get('/cr', (req, res) => {
-    if(req.session?.isLogin) {
-        res.render('cr', { isLogin: req.session.isLogin, isAdmin: true, 
-            numberUser: 62, userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
-            pageActive: 'cr'
-        });
-    } else {
-        res.redirect('/login');
-    }
+    if(!req.session.isLogin) return res.redirect('/login');
+
+    res.render('cr', { isLogin: req.session.isLogin, isAdmin: true, 
+        userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        pageActive: 'cr'
+    });
 });
 
 app.get('/inspect', (req, res) => {
-    if(req.session?.isLogin) {
-        if(!req.session.isAdmin)  return res.redirect('/');
-        res.render('inspect-redeem', { isLogin: req.session.isLogin, isAdmin: true, 
-            numberUser: 62, userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
-            pageActive: 'inspect'
-        });
-    } else {
-        res.redirect('/login');
-    }
+    if(!req.session.isLogin) return res.redirect('/login');
+    if(!req.session.isAdmin) return res.redirect('/');
+
+    res.render('inspect-redeem', { isLogin: req.session.isLogin, isAdmin: true, 
+        userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        pageActive: 'inspect'
+    });
 })
 
 app.get('/login', (req, res) => {
-    if(req.session.isLogin) {
-        res.redirect('/');
-    } else {
-        res.sendFile(path.resolve(process.cwd(), 'html', 'login.html'));
-    }
+    if(req.session.isLogin) return res.redirect('/');
+    res.sendFile(path.resolve(process.cwd(), 'html', 'login.html'));
 });
 
 app.get('/logout', (req, res) => {

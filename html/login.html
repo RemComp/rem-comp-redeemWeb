@@ -26,8 +26,6 @@
     <script src="/assets/vendor/js/helpers.js"></script>
     <!-- Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <script src="/assets/js/config.js"></script>
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
@@ -87,15 +85,12 @@
                                 <div class="mb-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <label class="form-label" for="password">Password</label>
-                                        <a href="//wa.me/" id="forgotPassword" class="small">Lupa Password?</a>
+                                        <a href="//wa.me/" id="forgotPassword" class="small">Register / Lupa Password?</a>
                                     </div>
                                     <div class="input-group input-group-merge">
                                         <input type="password" id="password" class="form-control" name="password" placeholder="Masukkan password anda" />
                                         <span class="input-group-text cursor-pointer"><i class='bx bx-hide' id="togglePassword"></i></span>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
                                 </div>
                                 <div class="mb-3">
                                     <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
