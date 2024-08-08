@@ -1,12 +1,16 @@
 'no strict';
-require('dotenv').config({ path: './example.env' });
+require('dotenv').config();
 
 const express = require('express');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+const MongoStore = require('connect-mongo');
+
 const multer = require('multer')();
 const path = require('path');
 const fs = require('fs');
+
+const mongoose = require('mongoose');
+const { sendOtpLoginUser, loginUser, updateDataUser, redeemItem, createRedeem, inspectRedeem } = require(path.resolve(process.cwd(), 'server', 'functions'));
 
 const app = express();
 
@@ -15,28 +19,30 @@ app.set('view engine', 'ejs');
 app.use(multer.array());
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-    store: new SQLiteStore({ dir: path.resolve(process.cwd(), 'sessions'), createDirIfNotExists: true, db: 'sessions.db'}),
+    store: MongoStore.create({ client: mongoose.connection.getClient(), dbName: 'db-redeemweb-rem-comp' }),
     secret: process.env.SESS_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
 }))
 app.use('/assets', express.static(path.resolve(process.cwd(), 'assets')));
+app.use(updateDataUser)
 
 app.get('/', (req, res) => {
     if(!req.session.isLogin) return res.redirect('/login');
 
-    res.render('index', { isLogin: req.session.isLogin, isAdmin: true, 
-        numberUser: req.session.iId, userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+    res.render('index', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
+        numberUser: req.session.iId, userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
         pageActive: 'redeem'
     });
 });
 
 app.get('/cr', (req, res) => {
     if(!req.session.isLogin) return res.redirect('/login');
+    if(!req.session.isPremium) return res.redirect('/');
 
-    res.render('cr', { isLogin: req.session.isLogin, isAdmin: true, 
-        userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+    res.render('cr', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
+        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
         pageActive: 'cr'
     });
 });
@@ -45,8 +51,8 @@ app.get('/inspect', (req, res) => {
     if(!req.session.isLogin) return res.redirect('/login');
     if(!req.session.isAdmin) return res.redirect('/');
 
-    res.render('inspect-redeem', { isLogin: req.session.isLogin, isAdmin: true, 
-        userName: req.session.username, roleUser: true ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+    res.render('inspect-redeem', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
+        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
         pageActive: 'inspect'
     });
 })
@@ -63,8 +69,7 @@ app.get('/logout', (req, res) => {
 
 app.post('/api/login', (req, res) => {
     if(req.body.action === 'verify') {
-        // to do: send otp to user
-        res.json({ status: true });
+        return sendOtpLoginUser(req, res);
     } else if(req.body.action === 'login') {
         // to do: login user
         
@@ -75,9 +80,45 @@ app.post('/api/login', (req, res) => {
             req.session.profilePic = '/assets/img/avatars/images_pp_blank.png';
             req.session.moneyUser = 999999999999;
             res.json({ status: true });
+        } else {
+            return loginUser(req, res);
         }
     }
 });
+
+
+// redeem
+app.post('/api/redeem', (req, res) => {
+    if(!req.session.isLogin) return res.status(401).json({ status: false, message: 'Unauthorized!' });
+
+    if(req.body.action === 'redeem') {
+        return redeemItem(req, res);
+    } else {
+        return res.status(400).json({ status: false, message: 'Bad Request!' });
+    }
+})
+
+app.post('/api/createRedeem', (req, res) => {
+    if(!req.session.isLogin) return res.status(401).json({ status: false, message: 'Unauthorized!' });
+    if(!req.session.isPremium) return res.status(403).json({ status: false, message: 'Forbidden!' });
+
+    if(req.body.action === 'create') {
+        return createRedeem(req, res);
+    } else {
+        return res.status(400).json({ status: false, message: 'Bad Request!' });
+    }
+})
+
+app.post('/api/inspectRedeem', (req, res) => {
+    if(!req.session.isLogin) return res.status(401).json({ status: false, message: 'Unauthorized!' });
+    if(!req.session.isAdmin) return res.status(403).json({ status: false, message: 'Forbidden!' });
+
+    if(req.body.action === 'inspect') {
+        return inspectRedeem(req, res);
+    } else {
+        return res.status(400).json({ status: false, message: 'Bad Request!' });
+    }
+})
 
 app.use((req, res) => {
     res.status(404).sendFile(path.resolve(process.cwd(), 'html', '404.html'));

@@ -3,7 +3,8 @@
 (function () {
   // listen when button id "code-verif-send" is clicked, then send request to server with data from form loginForm
   document.getElementById('code-verif-send').addEventListener('click', async () => {
-    const getNumberVerif = document.getElementById('number-verif').value;
+    let getNumberVerif = document.getElementById('number-verif').value;
+    if(getNumberVerif.startsWith('08')) getNumberVerif = getNumberVerif.replace('08', '628');
     let loginForm = new FormData();
     loginForm.append('numberVerif', getNumberVerif);
     loginForm.append('action', 'verify');
@@ -84,7 +85,8 @@
     let loginForm = new FormData();
     loginForm.append('type', typeLogin);
     if(typeLogin === 'number') {
-      const getNumberVerif = document.getElementById('number-verif').value;
+      let getNumberVerif = document.getElementById('number-verif').value;
+      if(getNumberVerif.startsWith('08')) getNumberVerif = getNumberVerif.replace('08', '628');
       const getCodeVerif = document.getElementById('code-verif').value;
 
       if (!getNumberVerif) {
@@ -187,14 +189,6 @@
     document.getElementById('loginWithPhone').addEventListener('click', function () {
       document.getElementById('email-login-form').style.display = 'none';
       document.getElementById('whatsapp-login-form').style.display = 'block';
-    });
-
-    document.getElementById('loginForm').addEventListener('submit', function (event) {
-      var recaptchaResponse = grecaptcha.getResponse();
-      if (document.getElementById('email-login-form').style.display === 'block' && recaptchaResponse.length === 0) {
-        event.preventDefault();
-        alert('Please complete the CAPTCHA');
-      }
     });
 
     document.getElementById('togglePassword').addEventListener('click', function (e) {

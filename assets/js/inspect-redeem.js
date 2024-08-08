@@ -11,14 +11,17 @@
         document.querySelector('button.inspect-redeem').setAttribute('disabled', 'disabled');
 
         const formDataBody = new FormData();
+        formDataBody.append('action', 'inspect');
         formDataBody.append('code', codeGet);
-        fetch('/api/inspect-redeem', {
+        fetch('/api/inspectRedeem', {
             method: 'POST',
             body: formDataBody
         })
-        .then((response) => {
+        .then(async (response) => {
+            document.querySelector('button.inspect-redeem').innerHTML = 'SUBMIT';
+            document.querySelector('button.inspect-redeem').removeAttribute('disabled');
             if(response.ok) {
-                const data = response.json();
+                const data = await response.json();
 // server response
 // {
 //     status: true,
@@ -57,7 +60,8 @@
                     document.querySelector('input#result-code-created').value = data.data.timeCreated;
                     document.querySelector('input#result-code-expired').value = data.data.timeExpired;
 
-                    document.querySelector('table#result-code-item tbody').innerHTML = '';
+                    const tBodyTableItem = document.querySelector('table#result-code-item tbody');
+                    if(tBodyTableItem) tBodyTableItem.innerHTML = '';
                     data.data.itemRedeem.forEach((item) => {
                         let tr = document.createElement('tr');
                         let tdItem = document.createElement('td');
@@ -76,6 +80,8 @@
                         tr.appendChild(tdExpired);
                         document.querySelector('table#result-code-item tbody').appendChild(tr);
                     })
+                } else {
+                    throw new Error(data.message);
                 }
             } else {
                 throw new Error('Network response was not ok. Response: ' + response.ok + '\n' + response.statusText);
@@ -85,9 +91,6 @@
             console.error('Error:', error);
             showToast('bg-danger', 'Error!', 'Something went wrong!\n' + error.message);
         })
-
-        document.querySelector('button.inspect-redeem').innerHTML = 'SUBMIT';
-        document.querySelector('button.inspect-redeem').removeAttribute('disabled');
     });
 
     document.querySelector('form.result-code').addEventListener('submit', function(e){

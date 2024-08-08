@@ -98,18 +98,22 @@
         }
 
         const formDataBody = new FormData();
+        formDataBody.append('action', 'create');
         formDataBody.append('redeemCount', redeemCount);
         formDataBody.append('timeRedeem', timeRedeem);
         formDataBody.append('timeValueRedeem', timeValueRedeem);
         formDataBody.append('priceRedeem', priceRedeem);
         formDataBody.append('redeemItems', JSON.stringify(redeemItems));
 
-        fetch('/api/submit-redeem', {
+        fetch('/api/createRedeem', {
             method: 'POST',
             body: formDataBody
-        }).then((response) => {
+        }).then(async (response) => {
+            // change submit button to normal, 'Submit'
+            document.querySelector('button.submit-redeem').innerHTML = 'SUBMIT';
+            document.querySelector('button.submit-redeem').removeAttribute('disabled');
             if (response.ok) {
-                const data = response.json();
+                const data = await response.json();
                 if(data.status) {
                     document.querySelector('input#resultCodeRedeem').value = data.data.codeRedeem;
                     document.querySelector('input#resultOwnerRedeem').value = data.data.ownerRedeem;
@@ -120,8 +124,9 @@
                 } else {
                     throw new Error(data.message);
                 }
+            } else {
+                throw new Error('Network response was not ok. Response: ' + response.ok + '\n' + response.statusText);
             }
-            throw new Error('Network response was not ok. Response: ' + response.ok + '\n' + response.statusText);
         }).then((data) => {
             console.log(data);
             showToast('bg-success', 'Success!', data.message);
@@ -129,10 +134,20 @@
             console.error('Error:', error);
             showToast('bg-danger', 'Error!', 'Something went wrong!\n' + error.message);
         });
+    });
 
-        // change submit button to normal, 'Submit'
-        document.querySelector('button.submit-redeem').innerHTML = 'SUBMIT';
-        document.querySelector('button.submit-redeem').removeAttribute('disabled');
+    document.querySelector('#copy-button-click').addEventListener('click', function() {
+        const input = document.querySelector('.input-group input');
+        input.select();
+        document.execCommand('copy');
+        input.blur();
+
+        $(this).find('.copy-button-icon').addClass('bx-check').removeClass('bx-copy').fadeIn('fast');
+        setTimeout(() => {
+            $(this).find('.copy-button-icon').fadeOut('fast', function() {
+                $(this).addClass('bx-copy').removeClass('bx-check').fadeIn('fast');
+            });
+        }, 1000)
     });
 })()
 

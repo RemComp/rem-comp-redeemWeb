@@ -20,13 +20,17 @@
         </a>
       </li>
 
-      <!-- Create Redeem -->
-      <li class="menu-item <% if (pageActive === 'cr') { %> <%= 'active' %> <% } %>">
-        <a href="/cr" class="menu-link">
-          <i class="menu-icon tf-icons bx bx-dock-top"></i>
-          <div data-i18n="Basic">Create Redeem</div>
-        </a>
-      </li>
+      <% if(isPremium) { %>
+        <!-- Create Redeem -->
+        <li class="menu-item <% if (pageActive === 'cr') { %> <%= 'active' %> <% } %>">
+          <a href="/cr" class="menu-link">
+            <i class="menu-icon tf-icons bx bx-dock-top"></i>
+            <div data-i18n="Basic">Create Redeem</div>
+          </a>
+        </li>
+      <% } %>
+
+      
 
       <% if(isAdmin) { %>
         <li class="menu-header small text-uppercase">

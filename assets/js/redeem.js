@@ -5,7 +5,9 @@
         document.querySelector('button.submit-redeem').innerHTML = '<span class="bx bx-loader bx-spin" role="status" aria-hidden="true"></span>';
         document.querySelector('button.submit-redeem').setAttribute('disabled', 'disabled');
 
-        let data = new FormData(this);
+        let data = new FormData();
+        data.append('action', 'redeem');
+        data.append('code', document.querySelector('input#basic-default-code').value);
 
         // server response
         // {
@@ -20,15 +22,15 @@
         //         itemRedeem: [
         //             {
         //                 item: 'Item 1',
-        //                 qty: 1
+        //                 amount: 1
         //             },
         //             {
         //                 item: 'Item 2',
-        //                 qty: 9
+        //                 amount: 9
         //             },
         //             {
         //                 item: 'Item 3',
-        //                 qty: 10,
+        //                 amount: 10,
         //                 expired: '2021-08-02 12:00:00'
         //             }
         //         ]
@@ -39,9 +41,12 @@
         fetch('/api/redeem', {
             method: 'POST',
             body: data
-        }).then((response) => {
+        }).then(async (response) => {
+            // change submit button to normal, 'Submit'
+            document.querySelector('button.submit-redeem').innerHTML = 'Tukar Kode';
+            document.querySelector('button.submit-redeem').removeAttribute('disabled');
             if (response.ok) {
-                const data = response.json();
+                const data = await response.json();
                 if(data.status) {
                     let modalBody = '';
                     modalBody += '<div class="row mb-4">';
@@ -62,10 +67,10 @@
             
                     data.data.itemRedeem.forEach((item) => {
                         if(item.expired) {
-                            modalBody += '<input type="text" class="form-control mb-2" value="' + item.item + ' (' + item.qty + ') - Expired: ' + item.expired + '" disabled/>';
+                            modalBody += '<input type="text" class="form-control mb-2" value="' + item.item + ' (' + item.amount + ') - Expired: ' + item.expired + '" disabled/>';
                             return;
                         }
-                        modalBody += '<input type="text" class="form-control mb-2" value="' + item.item + ' (' + item.qty + ')" disabled/>';
+                        modalBody += '<input type="text" class="form-control mb-2" value="' + item.item + ' (' + item.amount + ')" disabled/>';
                     });
             
                     modalBody += '</div>';
@@ -73,6 +78,7 @@
                     document.querySelector('.modal-body').innerHTML = modalBody;
                     $('#modalCenter').modal('show');
                 } else {
+                    console.log(data);
                     throw new Error(data.message);
                 }
             } else {
@@ -82,9 +88,5 @@
             console.error('Error:', error);
             showToast('bg-danger', 'Error!', 'Something went wrong!\n' + error.message);
         });
-
-        // change submit button to normal, 'Submit'
-        document.querySelector('button.submit-redeem').innerHTML = 'Tukar Kode';
-        document.querySelector('button.submit-redeem').removeAttribute('disabled');
     });
 })();
