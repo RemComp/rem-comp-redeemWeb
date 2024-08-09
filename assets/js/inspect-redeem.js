@@ -60,7 +60,7 @@
                     document.querySelector('input#result-code-created').value = data.data.timeCreated;
                     document.querySelector('input#result-code-expired').value = data.data.timeExpired;
 
-                    const tBodyTableItem = document.querySelector('table#result-code-item tbody');
+                    const tBodyTableItem = document.querySelector('table.result-code-item tbody');
                     if(tBodyTableItem) tBodyTableItem.innerHTML = '';
                     data.data.itemRedeem.forEach((item) => {
                         let tr = document.createElement('tr');
@@ -68,17 +68,18 @@
                         let tdQty = document.createElement('td');
                         let tdExpired = document.createElement('td');
                         const itemIcon = document.createElement('i');
-                        itemIcon.classList.add(mapRedeemItem[item.item].icon);
+                        if(mapRedeemItem[item.item]) itemIcon.classList = mapRedeemItem[item.item].icon
+                        if(!mapRedeemItem[item.item]) itemIcon.classList = 'bx bx-package bx-sm me-3';
                         tdItem.appendChild(itemIcon);
-                        tdItem.textContent = item.item;
-                        tdQty.textContent = item.qty;
+                        tdItem.innerHTML += ' ' + item.item;
+                        tdQty.textContent = item.amount;
                         if(item.expired) {
                             tdExpired.textContent = item.expired;
                         }
                         tr.appendChild(tdItem);
                         tr.appendChild(tdQty);
                         tr.appendChild(tdExpired);
-                        document.querySelector('table#result-code-item tbody').appendChild(tr);
+                        document.querySelector('table.result-code-item tbody').appendChild(tr);
                     })
                 } else {
                     throw new Error(data.message);
