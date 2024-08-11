@@ -28,7 +28,8 @@
     "build:prod:fonts": "npx gulp build:fonts --env=production",
     "build:prod:copy": "npx gulp build:copy --env=production",
     "watch": "npx gulp watch",
-    "serve": "npx gulp serve"
+    "serve": "npx gulp serve",
+    "start": "node run.js",
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
