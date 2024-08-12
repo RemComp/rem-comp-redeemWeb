@@ -115,7 +115,8 @@
             if (response.ok) {
                 const data = await response.json();
                 if(data.status) {
-                    document.querySelector('input#resultCodeRedeem').value = 'https://redeem.remcp.com?code=' + data.data.codeRedeem;
+                    document.querySelector('input#resultCodeRedeem').value = data.data.codeRedeem;
+                    document.querySelector('input#resultUrlRedeem').value = 'https://redeem.remcp.com?code=' + data.data.codeRedeem;
                     document.querySelector('input#resultOwnerRedeem').value = data.data.ownerRedeem;
                     document.querySelector('input#resultLimitRedeem').value = data.data.limitRedeem;
                     document.querySelector('input#resultTimeRedeem').value = data.data.timeRedeem;
@@ -133,18 +134,20 @@
         });
     });
 
-    document.querySelector('#copy-button-click').addEventListener('click', function() {
-        const input = document.querySelector('.input-group input');
-        input.select();
-        document.execCommand('copy');
-        input.blur();
-
-        $(this).find('.copy-button-icon').addClass('bx-check').removeClass('bx-copy').fadeIn('fast');
-        setTimeout(() => {
-            $(this).find('.copy-button-icon').fadeOut('fast', function() {
-                $(this).addClass('bx-copy').removeClass('bx-check').fadeIn('fast');
-            });
-        }, 1000)
+    document.querySelectorAll('.copy-button-click').forEach((button) => {
+        button.addEventListener('click', function() {
+            const classClicked = this.className.split(' ').find((c) => c.includes('copy-c'));
+            const input = document.querySelector(`.${classClicked}`);
+            input.select();
+            if(input.setselectionRange) input.setselectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            $(this).find('.copy-button-icon').addClass('bx-check').removeClass('bx-copy').fadeIn('fast');
+            setTimeout(() => {
+                $(this).find('.copy-button-icon').fadeOut('fast', function() {
+                    $(this).addClass('bx-copy').removeClass('bx-check').fadeIn('fast');
+                });
+            }, 1000)
+        });
     });
 })()
 
