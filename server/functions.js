@@ -2,6 +2,10 @@ const axios = require('axios')
 const bcrypt = require('bcryptjs')
 const { _mongo_UserSchema, _mongo_OtpRequestSchema } = require('./dbtype')
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 /**
  * description: update user data
  * @param {Object} req - express request object
@@ -192,5 +196,6 @@ module.exports = {
     redeemItem,
     createRedeem,
     inspectRedeem,
-    redirectToLogin
+    redirectToLogin,
+    numberWithCommas
 }

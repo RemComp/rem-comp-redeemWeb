@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 
 const mongoose = require('mongoose');
-const { sendOtpLoginUser, loginUser, updateDataUser, redeemItem, createRedeem, inspectRedeem, redirectToLogin } = require(path.resolve(process.cwd(), 'server', 'functions'));
+const { sendOtpLoginUser, loginUser, updateDataUser, redeemItem, createRedeem, inspectRedeem, redirectToLogin, numberWithCommas } = require(path.resolve(process.cwd(), 'server', 'functions'));
 
 const app = express();
 
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
     if(!req.session.isLogin) return redirectToLogin(req, res);
 
     res.render('index', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
-        numberUser: req.session.iId, userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        numberUser: req.session.iId, userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: numberWithCommas(req.session.moneyUser),
         pageActive: 'redeem'
     });
 });
@@ -42,7 +42,7 @@ app.get('/cr', (req, res) => {
     if(!req.session.isPremium) return res.redirect('/');
 
     res.render('cr', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
-        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: numberWithCommas(req.session.moneyUser),
         pageActive: 'cr'
     });
 });
@@ -52,7 +52,7 @@ app.get('/inspect', (req, res) => {
     if(!req.session.isAdmin) return res.redirect('/');
 
     res.render('inspect-redeem', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
-        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
+        userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: numberWithCommas(req.session.moneyUser),
         pageActive: 'inspect'
     });
 })
