@@ -115,7 +115,7 @@
             if (response.ok) {
                 const data = await response.json();
                 if(data.status) {
-                    document.querySelector('input#resultCodeRedeem').value = data.data.codeRedeem;
+                    document.querySelector('input#resultCodeRedeem').value = 'https://redeem.remcp.com?code=' + data.data.codeRedeem;
                     document.querySelector('input#resultOwnerRedeem').value = data.data.ownerRedeem;
                     document.querySelector('input#resultLimitRedeem').value = data.data.limitRedeem;
                     document.querySelector('input#resultTimeRedeem').value = data.data.timeRedeem;
@@ -127,9 +127,6 @@
             } else {
                 throw new Error('Network response was not ok. Response: ' + response.ok + '\n' + response.statusText);
             }
-        }).then((data) => {
-            console.log(data);
-            showToast('bg-success', 'Success!', data.message);
         }).catch((error) => {
             console.error('Error:', error);
             showToast('bg-danger', 'Error!', 'Something went wrong!\n' + error.message);

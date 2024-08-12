@@ -133,15 +133,10 @@ async function redeemItem(req, res) {
  */
 async function createRedeem(req, res) {
     if(!req?.body?.redeemCount || isNaN(req?.body?.redeemCount)) return res.status(400).json({ status: false, message: 'Bad Request!' })
-        console.log('1')
     if(!req?.body?.timeRedeem || !['Hari', 'Jam'].includes(req?.body?.timeRedeem)) return res.status(400).json({ status: false, message: 'Bad Request!' })
-        console.log('2')
     if(!req?.body?.timeValueRedeem || isNaN(req?.body?.timeValueRedeem)) return res.status(400).json({ status: false, message: 'Bad Request!' })
-        console.log('3')
     if(!req?.body?.redeemItems) return res.status(400).json({ status: false, message: 'Bad Request!' })
-        console.log('4')
     if(!req?.body?.priceRedeem || isNaN(req?.body?.priceRedeem)) return res.json({ status: false, message: 'Bad Request!' })
-        console.log('5')
 
     let parsedItems = []
     try {
