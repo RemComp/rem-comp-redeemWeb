@@ -58,7 +58,7 @@ app.get('/inspect', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-    if(req.session.isLogin) return res.redirect('/');
+    if(req.session.isLogin) return redirectToLogin(req, res);
     res.sendFile(path.resolve(process.cwd(), 'html', 'login.html'));
 });
 
