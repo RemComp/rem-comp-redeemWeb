@@ -35,14 +35,23 @@
             showToast('bg-warning', 'Failed!', 'Pilih jenis Item!');
             document.getElementById('itemName').style.outline = '1px solid red';
             return;
-        } else {
-            document.getElementById('itemName').style.outline = 'none';
-
-            // remove data-value and set back to default
-            buttonItemNameSelect.dataset.value = '';
-            buttonItemNameSelect.innerHTML = 'Tidak Dipilih';
         }
+
         const itemCount = document.getElementById('itemCount').value;
+        if (!itemCount) {
+            showToast('bg-warning', 'Failed!', 'Masukkan jumlah item!');
+            document.getElementById('itemCount').style.outline = '1px solid red';
+            return;
+        } else if(mapRedeemItem[itemName].limitItem && (Number(itemCount.replace(/\./g, '')) > mapRedeemItem[itemName].limitItem)) {
+            showToast('bg-warning', 'Failed!', 'Jumlah item melebihi batas!' + '\n' + 'Batas: ' + numberWithCommas(mapRedeemItem[itemName].limitItem));
+            document.getElementById('itemCount').style.outline = '1px solid red';
+            return;
+        }
+        
+        document.getElementById('itemName').style.outline = 'none';
+        // remove data-value and set back to default
+        buttonItemNameSelect.dataset.value = '';
+        buttonItemNameSelect.innerHTML = 'Tidak Dipilih';
 
         let table = document.getElementById('listItemRedeem');
         let row = table.insertRow(-1);
