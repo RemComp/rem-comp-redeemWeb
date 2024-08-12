@@ -186,7 +186,7 @@ async function inspectRedeem(req, res) {
  * @param {Object} res - express response object
  */
 function redirectToLogin(req, res) {
-    const checkCodeParams = req.query.code ? `?code=${req.query.redeem}` : ''
+    const checkCodeParams = req.query.code ? `?code=${req.query.code}` : ''
     return res.redirect(`/login${checkCodeParams}`)
 }
 
