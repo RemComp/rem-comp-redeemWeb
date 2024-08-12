@@ -1,4 +1,10 @@
 ;(function () {
+
+    // if params has code, set value to input basic-default-code
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if(code) document.querySelector('input#basic-default-code').value = code;
+
     document.querySelector('form.submit-redeem').addEventListener('submit', function (event) {
         event.preventDefault();
 

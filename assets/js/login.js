@@ -169,7 +169,13 @@
             showToast('bg-danger', 'Error!', 'User not found!');
           }
         } else {
-          window.location.href = '/';
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirect = urlParams.get('code');
+          if(redirect) {
+            window.location.href = '/?code=' + redirect;
+          } else {
+            window.location.href = '/';
+          }
         }
       } else {
         throw new Error('Network response was not ok. Response: ' + response.ok + '\n' + response.statusText);

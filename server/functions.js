@@ -180,11 +180,27 @@ async function inspectRedeem(req, res) {
     }
 }
 
+/**
+ * description: redirect to login with the params redeem if exist
+ * @param {Object} req - express request object
+ * @param {Object} res - express response object
+ */
+function redirectToLogin(req, res) {
+    const urlParams = new URLSearchParams(req.url)
+    const redirect = urlParams.get('code')
+    if(redirect) {
+        return res.redirect('/login?code=' + redirect)
+    } else {
+        return res.redirect('/login')
+    }
+}
+
 module.exports = {
     updateDataUser,
     sendOtpLoginUser,
     loginUser,
     redeemItem,
     createRedeem,
-    inspectRedeem
+    inspectRedeem,
+    redirectToLogin
 }

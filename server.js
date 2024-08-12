@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 
 const mongoose = require('mongoose');
-const { sendOtpLoginUser, loginUser, updateDataUser, redeemItem, createRedeem, inspectRedeem } = require(path.resolve(process.cwd(), 'server', 'functions'));
+const { sendOtpLoginUser, loginUser, updateDataUser, redeemItem, createRedeem, inspectRedeem, redirectToLogin } = require(path.resolve(process.cwd(), 'server', 'functions'));
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use('/assets', express.static(path.resolve(process.cwd(), 'assets')));
 app.use(updateDataUser)
 
 app.get('/', (req, res) => {
-    if(!req.session.isLogin) return res.redirect('/login');
+    if(!req.session.isLogin) return redirectToLogin(req, res);
 
     res.render('index', { isLogin: req.session.isLogin, isAdmin: req.session.isAdmin, isPremium: req.session.isPremium,
         numberUser: req.session.iId, userName: req.session.username, roleUser: req.session.isAdmin ? 'Admin' : 'User', profilePic: req.session.profilePic, moneyUser: req.session.moneyUser,
@@ -68,6 +68,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.post('/api/login', (req, res) => {
+    if(req.session.isLogin) return res.status(400).json({ status: false, message: 'Already login, refresh the page!' });
     if(req.body.action === 'verify') {
         return sendOtpLoginUser(req, res);
     } else if(req.body.action === 'login') {
